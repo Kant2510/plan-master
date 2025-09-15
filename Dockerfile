@@ -15,7 +15,7 @@ FROM openjdk:24-jdk AS runner
 
 WORKDIR /app
 
-COPY --from=builder ./app/target/backend-0.0.1-SNAPSHOT.jar ./app.jar
+COPY --from=builder ./app/target/*-SNAPSHOT.jar ./app.jar
 
 EXPOSE 8000
 
