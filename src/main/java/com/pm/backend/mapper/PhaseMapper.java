@@ -13,7 +13,6 @@ import org.mapstruct.NullValueCheckStrategy;
 public interface PhaseMapper {
     @Mapping(target = "id",        expression = "java(phase.getId() != null ? phase.getId() : null)")
     @Mapping(target = "title",     expression = "java(phase.getTitle() != null ? phase.getTitle() : null)")
-    @Mapping(target = "boardId",  expression = "java(phase.getBoard() != null && phase.getBoard().getId() != null ? phase.getBoard().getId() : null)")
     @Mapping(target = "taskIds",  expression = "java(phase.getTasks() == null ? java.util.List.of() : phase.getTasks().stream().map(t -> t.getId()).toList())")
     PhaseResponseDTO toResponseDto(Phase phase);
 }

@@ -36,7 +36,7 @@ public class ProjectController {
     }
 
     @PostMapping("/sprint/create")
-    public ResponseEntity<ProjectResponseDTO> createSprint(@RequestParam String projectId) {
+    public ResponseEntity<ProjectResponseDTO> createSprint(@RequestParam Integer projectId) {
         String userName = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         ProjectResponseDTO project = projectService.createSprint(userName, projectId);
         return project != null ? ResponseEntity.ok(project)

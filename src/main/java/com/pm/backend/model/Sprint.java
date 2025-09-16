@@ -13,13 +13,15 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "sprint", indexes = @Index(columnList = "project_id, orderIndex", unique = true))
 @NoArgsConstructor
 @AllArgsConstructor
 public class Sprint {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sprint_seq")
+    @SequenceGenerator(name = "sprint_seq", sequenceName = "sprint_seq", allocationSize = 1)
     private Integer id;
 
     @NotNull

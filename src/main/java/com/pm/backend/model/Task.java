@@ -19,7 +19,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Task {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "task_seq")
+    @SequenceGenerator(name = "task_seq", sequenceName = "task_seq", allocationSize = 1)
     private Integer id;
 
     @NotNull

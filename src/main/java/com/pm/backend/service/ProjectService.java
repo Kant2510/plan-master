@@ -1,12 +1,9 @@
 package com.pm.backend.service;
 
+import com.pm.backend.constant.SprintConstant;
 import com.pm.backend.dto.CreateProjectRequestDTO;
-import com.pm.backend.model.Project;
-import com.pm.backend.model.ProjectMember;
-import com.pm.backend.model.UserProfile;
-import com.pm.backend.repository.ProjectMemberRepo;
-import com.pm.backend.repository.ProjectRepo;
-import com.pm.backend.repository.UserRepo;
+import com.pm.backend.model.*;
+import com.pm.backend.repository.*;
 import org.springframework.stereotype.Service;
 
 import com.pm.backend.dto.ProjectResponseDTO;
@@ -25,12 +22,16 @@ public class ProjectService {
     private final ProjectRepo projectRepo;
     private final UserRepo userRepo;
     private final ProjectMemberRepo projectMemberRepo;
+    private final SprintRepo sprintRepo;
+    private final BoardRepo boardRepo;
     private final ProjectMapper projectMapper;
 
-    public ProjectService(ProjectRepo projectRepo, UserRepo userRepo, ProjectMemberRepo projectMemberRepo, ProjectMapper projectMapper) {
+    public ProjectService(ProjectRepo projectRepo, UserRepo userRepo, ProjectMemberRepo projectMemberRepo, SprintRepo sprintRepo, BoardRepo boardRepo, ProjectMapper projectMapper) {
         this.projectRepo = projectRepo;
         this.userRepo = userRepo;
         this.projectMemberRepo = projectMemberRepo;
+        this.sprintRepo = sprintRepo;
+        this.boardRepo = boardRepo;
         this.projectMapper = projectMapper;
     }
 
@@ -64,26 +65,16 @@ public class ProjectService {
                 .project(savedProject)
                 .member(user)
                 .role("none")
+                .joinedAt(Instant.parse(request.createdAt))
                 .build();
-
-        // Use a modifiable Set instead of an immutable one
-        Set<ProjectMember> members = new HashSet<>();
-        members.add(pm);
-
-        // Update the saved project's members
-        savedProject.setMembers(members);
-
-        // Save the project and its members
-        projectRepo.save(savedProject);
         projectMemberRepo.save(pm);
 
         return projectMapper.toResponseDto(savedProject);
     }
 
-    public ProjectResponseDTO createSprint(String userId, String projectId) {
+    public ProjectResponseDTO createSprint(String userId, Integer projectId) {
         UUID userUUID = UUID.fromString(userId);
-        Integer projId = Integer.parseInt(projectId);
-        Project project = projectRepo.findById(projId).orElseThrow();
+        Project project = projectRepo.findById(projectId).orElseThrow();
 
         // Increment the sprint count
         int newSprintCount = project.getSprintCount() + 1;
@@ -91,9 +82,21 @@ public class ProjectService {
         project.setUser_updated(userUUID);
         project.setDate_updated(Instant.now());
 
-        // Save the updated project
-        Project updatedProject = projectRepo.save(project);
+        Sprint newSprint = Sprint.builder()
+                .orderIndex(newSprintCount)
+                .start_date(Instant.now())
+                .end_date(Instant.now().plusSeconds(7 * 24 * 60 * 60)) // Default to one week later
+                .status(SprintConstant.SPRINT_STATUS.PLANNED)
+                .project(project)
+                .user_created(userUUID)
+                .build();
+        Sprint savedSprint = sprintRepo.save(newSprint);
 
-        return projectMapper.toResponseDto(updatedProject);
+        Board newBoard = Board.builder()
+                .sprint(savedSprint)
+                .build();
+        boardRepo.save(newBoard);
+
+        return projectMapper.toResponseDto(project);
     }
 }

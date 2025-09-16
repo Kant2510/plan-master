@@ -15,7 +15,8 @@ import java.time.Instant;
 @NoArgsConstructor
 public class ProjectMember {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "project_member_seq")
+    @SequenceGenerator(name = "project_member_seq", sequenceName = "project_member_seq", allocationSize = 1)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

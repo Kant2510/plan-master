@@ -1,5 +1,6 @@
 package com.pm.backend.controller;
 
+import com.pm.backend.dto.CreatePhaseRequestDTO;
 import com.pm.backend.dto.PhaseQueryRequestDTO;
 import com.pm.backend.dto.PhaseResponseDTO;
 import com.pm.backend.service.PhaseService;
@@ -30,6 +31,19 @@ public class PhaseController {
         // Call the service to get scores
         List<PhaseResponseDTO> phases = phaseService.getPhaseByBoardId(request.getBoard_id());
         return phases != null ? ResponseEntity.ok(phases)
+                : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<PhaseResponseDTO> createPhase(@RequestBody CreatePhaseRequestDTO request) {
+        // Validate the request
+        if (request == null || request.getBoardId() == null || request.getBoardId() < 0 ||
+                request.getName() == null || request.getName().isBlank()) {
+            throw new RuntimeException("Invalid request: board_id and name cannot be null or blank");
+        }
+        // Call the service to get scores
+        PhaseResponseDTO phase = phaseService.createPhase(request);
+        return phase != null ? ResponseEntity.ok(phase)
                 : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
 }

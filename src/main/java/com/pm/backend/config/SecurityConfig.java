@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login", "api/auth/register").permitAll()
                         .requestMatchers("/api/v1/**").hasRole("USER")
                         .anyRequest().authenticated())
                 .userDetailsService(userDetailService)

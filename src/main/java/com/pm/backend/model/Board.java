@@ -9,13 +9,15 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "board")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Board {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "board_seq")
+    @SequenceGenerator(name = "board_seq", sequenceName = "board_seq", allocationSize = 1)
     private Integer id;
 
     @NotNull
